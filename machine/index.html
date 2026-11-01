@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Prototype Machine</title>
+<meta name="description" content="An interactive simulation of how AI screening trained on past exits can lock bias into venture funding.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<p style="max-width:1040px;margin:12px auto 0;padding-inline:max(16px,env(safe-area-inset-left,0px));font-family:ui-monospace,Menlo,monospace;font-size:12px"><a href="../" style="color:inherit">← Capstone home</a></p>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:14px">
+    <span class="eyebrow">Interactive prototype · COGS 301 senior project · v0.1</span>
+    <h1>The Prototype Machine</h1>
+    <p class="lede">You're a partner at a seed fund. Twelve founders want a meeting and you can back four. Then an AI screener learns from your fund's history and your picks, and starts deciding on its own.</p>
+    <nav class="acts-nav" aria-label="Progress"><span id="n1" class="on">1 · You screen</span><span id="n2">2 · It learns</span><span id="n3">3 · It runs</span></nav>
+  </header>
+
+  <!-- ACT 1 -->
+  <section class="act" id="act1" aria-labelledby="a1h">
+    <h2 id="a1h">Pick four. Go with your gut.</h2>
+    <p class="muted">Real screeners spend minutes, not hours, on a first pass. Don't overthink it.</p>
+    <div class="deck" id="deck"></div>
+    <div class="sticky"><span class="count" id="count">0 of 4 picked</span><button class="btn" id="fundBtn" disabled>Fund these four</button></div>
+  </section>
+
+  <!-- ACT 2 -->
+  <section class="act" id="act2" hidden aria-labelledby="a2h">
+    <h2 id="a2h">Your four became training data.</h2>
+    <p>Here's how your picks did. These outcomes now join your fund's history, the record the AI screener learns from.</p>
+    <div class="results" id="results"></div>
+    <p class="muted">The eight you passed on:</p>
+    <div class="ghosts" id="ghosts"></div>
+    <p><b>You will never learn how they would have done.</b> Nobody funded them, so they never produced an outcome. The model can't learn from founders it never saw succeed or fail.</p>
+    <div class="proto" aria-live="polite">
+      <span class="eyebrow" style="color:var(--machine)">The screener's picture of a winner</span>
+      <p>It averages every founder in the history who exited, then scores new applicants by how closely they resemble that average. This is prototype matching, the same way people judge whether a robin or a penguin is "more of a bird."</p>
+      <div class="bars" id="protoBars"></div>
+      <p class="muted" style="font-size:13px">Bar = share of past winners with that trait. Black tick = share among today's applicants.</p>
+    </div>
+    <div class="row"><button class="btn machine" id="handoff">Hand screening to the AI</button></div>
+  </section>
+
+  <!-- ACT 3 -->
+  <section class="act" id="act3" hidden aria-labelledby="a3h">
+    <h2 id="a3h">Five funding cycles. 300 applicants each. 30 checks.</h2>
+    <p>Applicants are half women, a quarter from elite schools, 40% from the three big hubs. Talent is spread equally across every group. Watch who gets funded.</p>
+    <div class="row">
+      <button class="btn machine" id="stepBtn">Run cycle 1</button>
+      <button class="btn ghost" id="allBtn">Run all five</button>
+      <span class="cyc" id="cycLabel">Cycle 0 of 5</span>
+    </div>
+    <p class="narr" id="narr" aria-live="polite">Each square below will be one applicant.</p>
+    <div class="dash">
+      <div class="panel">
+        <div class="row" style="justify-content:space-between">
+          <strong>This cycle's applicants</strong>
+          <div class="lens" role="group" aria-label="Color applicants by">
+            <button aria-pressed="true" data-lens="female">Gender</button><button aria-pressed="false" data-lens="elite">School</button><button aria-pressed="false" data-lens="hub">Location</button>
+          </div>
+        </div>
+        <canvas id="field" width="600" height="420" aria-label="Grid of applicants; filled squares were funded"></canvas>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="panel">
+        <strong>Share of funded founders who are <span id="lensWord">women</span></strong>
+        <div id="chart"></div>
+        <p class="muted" style="font-size:13px">Dashed line = share among applicants. If the screener only saw talent, funding would hover near it.</p>
+      </div>
+    </div>
+    <div class="tallies">
+      <div class="tally"><b id="tTop">0</b><span>of the true top 30 each cycle got funded (running total)</span></div>
+      <div class="tally"><b id="tTopW">0</b><span>top-30 women funded, out of <span id="tTopWof">0</span> who existed</span></div>
+      <div class="tally"><b id="tTopM">0</b><span>top-30 men funded, out of <span id="tTopMof">0</span> who existed</span></div>
+    </div>
+
+    <div class="reveal" id="reveal" hidden>
+      <span class="eyebrow">What you rewarded</span>
+      <p id="youLine" style="font-size:17px"></p>
+      <p id="missLine"></p>
+      <p id="lockLine" class="muted"></p>
+      <div class="row"><button class="btn ghost" id="again">Screen a new batch</button></div>
+      <p class="muted" style="font-size:13.5px">Next version: switch on interventions (traction anchors, exploration slots, training on unfunded founders) and see which ones break the loop.</p>
+    </div>
+  </section>
+
+  <details>
+    <summary>How this world works (and what's made up)</summary>
+    <ul>
+      <li><b>Talent is equal across groups.</b> Each founder has a hidden potential score drawn the same way for everyone. That's a stated assumption, not a finding.</li>
+      <li><b>Traction is a noisy signal of potential.</b> Revenue growth tracks potential but with a lot of noise, as early metrics do.</li>
+      <li><b>Outcomes include a network advantage.</b> Elite-school and hub founders get a boost to exit odds from follow-on access and connections, separate from talent. Loosely motivated by Howell &amp; Nanda (2024) and Gompers et al. on networks; the size is illustrative.</li>
+      <li><b>History is skewed.</b> The fund's 300 past deals were 12% women, 60% elite school and 75% hub. Illustrative, in the range of reported funding gaps (PitchBook, Carta), not real fund data.</li>
+      <li><b>The screener is a prototype matcher.</b> It scores applicants by traction plus resemblance to the average past winner (Rosch's prototype theory; Bonelli 2023 finds AI-using VCs drift toward startups resembling past ones).</li>
+      <li><b>Only funded founders produce outcomes.</b> This is the selective-labels problem (Lakkaraju et al. 2017). Rejected founders never teach the model anything.</li>
+      <li>Nothing you click is saved or sent anywhere.</li>
+    </ul>
+  </details>
+</div>
+<script src="src/sim.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>

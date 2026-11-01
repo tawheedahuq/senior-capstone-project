@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}*{box-sizing:border-box}body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}.home-link{font-family:ui-monospace,Menlo,monospace;font-size:12px}</style>
+<title>Who Gets the Dollar</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: scrollytelling ride — one sticky field of 1,000 dots re-forms per scene while the story scrolls beside (desktop) or below (phone) it. */
+:root{
+  --bg:#f2f3f1; --surface:#ffffff; --ink:#15191f; --muted:#5d6670; --line:#d6dad9;
+  --dot:#b9c0c4; --a:#c2416b; --b:#3f5bd1; --hot:#b35a12; --flag:#9a6a00;
+  --display:"Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1013; --surface:#161a1f; --ink:#e8ebee; --muted:#9aa3ad; --line:#2a3038;
+  --dot:#3a424b; --a:#f28aaa; --b:#8ea2ff; --hot:#f0a35c; --flag:#e0be4a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1013; --surface:#161a1f; --ink:#e8ebee; --muted:#9aa3ad; --line:#2a3038;
+  --dot:#3a424b; --a:#f28aaa; --b:#8ea2ff; --hot:#f0a35c; --flag:#e0be4a; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.ride{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:40px}
+.stage{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;height:100dvh;display:flex;align-items:center;order:2}
+.stage-inner{position:relative;width:100%;aspect-ratio:1/1;max-height:88vh;max-width:100%}
+canvas{width:100%;height:100%;display:block}
+.label{position:absolute;font-family:var(--mono);font-size:12px;color:var(--muted);transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;transition:opacity .5s}
+.label.hot{color:var(--ink);font-weight:500}
+.story{order:1;display:flex;flex-direction:column}
+.step{min-height:90vh;display:flex;flex-direction:column;justify-content:center;gap:12px;padding-block:24px}
+.step:first-child{min-height:80vh;padding-top:48px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(40px,6vw,68px);line-height:1;margin:0;letter-spacing:-.015em}
+.num{font-family:var(--display);font-weight:800;font-size:clamp(56px,8vw,96px);line-height:.95;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.num small{font-size:.38em;font-weight:600;letter-spacing:0;margin-left:6px;color:var(--muted)}
+h2{font-family:var(--display);font-weight:600;font-size:clamp(21px,2.4vw,27px);line-height:1.2;margin:0;text-wrap:balance}
+p{margin:0;max-width:56ch}
+.src{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.flag{font-size:13px;color:var(--flag)}
+.key{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.key i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.hint{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.links a{color:var(--ink);text-decoration:none;border:1px solid var(--line);padding:8px 12px;background:var(--surface);font-size:14px}
+.links a:hover{border-color:var(--ink)}
+.links a:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.prog{position:fixed;right:max(12px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;z-index:5}
+.prog i{width:6px;height:6px;border-radius:50%;background:var(--dot);transition:background .3s,transform .3s}
+.prog i.on{background:var(--ink);transform:scale(1.5)}
+@media (max-width:820px){
+  .ride{grid-template-columns:1fr;gap:0}
+  .stage{order:0;height:auto;top:env(safe-area-inset-top,0px);z-index:2;background:var(--bg);padding-block:8px}
+  .stage-inner{max-width:min(100%,46vh);margin:0 auto}
+  .step{min-height:70vh}
+  .step>*{position:relative}
+  .step{background:linear-gradient(to bottom,transparent,var(--bg) 8%,var(--bg) 92%,transparent)}
+  .prog{display:none}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<p class="home-link" style="max-width:1200px;margin:12px auto 0;padding-inline:max(16px,env(safe-area-inset-left,0px))"><a href="../" style="color:inherit">← Capstone home</a></p>
+<div class="prog" id="prog" aria-hidden="true"></div>
+<div class="ride">
+  <div class="stage" aria-hidden="true"><div class="stage-inner" id="stageInner"><canvas id="cv"></canvas></div></div>
+  <div class="story" id="story">
+
+    <section class="step" data-scene="intro">
+      <span class="eyebrow">COGS 301 senior project · the research, moving</span>
+      <h1>Who Gets the Dollar</h1>
+      <p>These are 1,000 dots. For most of this ride, each one is $1 out of every $1,000 of US venture capital. Scroll, and watch where the money goes, what the research says about why, and what happens when an AI learns from it.</p>
+      <span class="hint">↓ scroll to ride</span>
+    </section>
+
+    <section class="step" data-scene="women">
+      <span class="eyebrow">Scene 1 · 2025</span>
+      <div class="num">277<small>of 1,000</small></div>
+      <h2>went to companies with at least one woman founder. A record.</h2>
+      <p>That's 27.7% of US venture deal value, up from about 20% the year before. It looks like progress.</p>
+      <div class="key"><span><i style="background:var(--a)"></i>at least one woman founder</span><span><i style="background:var(--dot)"></i>no woman founder</span></div>
+      <span class="src">PitchBook, 2025 US All In: Female Founders report</span>
+    </section>
+
+    <section class="step" data-scene="megadeals">
+      <span class="eyebrow">Scene 2 · look closer</span>
+      <div class="num">113<small>of those 277</small></div>
+      <h2>went to just two companies.</h2>
+      <p>About two-thirds of the money for women-founded companies went into AI, and two AI megadeals (Anthropic and Scale AI) raised over $30 billion between them. Take those two out and most of the jump goes with them.</p>
+      <span class="src">PitchBook via Fortune, Mar 2026. Dot counts are proportional to reported dollars.</span>
+    </section>
+
+    <section class="step" data-scene="allfemale">
+      <span class="eyebrow">Scene 3 · only women on the team</span>
+      <div class="num">11–21<small>of 1,000</small></div>
+      <h2>went to teams made up only of women.</h2>
+      <p>Solid dots are the low estimate. Hollow dots are where sources disagree.</p>
+      <p class="flag">⚑ Reports range from 1.1% (2025) to 2.1% (Q1 2026). Confirm in PitchBook's report before citing.</p>
+      <span class="src">Secondary readings of PitchBook data (The Source Code; Kathryn Finney; Milken Institute)</span>
+    </section>
+
+    <section class="step" data-scene="black">
+      <span class="eyebrow">Scene 4 · 2024</span>
+      <div class="num">4<small>of 1,000</small></div>
+      <h2>went to startups with a Black founder.</h2>
+      <p>About $730 million out of US startup funding that year, the lowest share in years and down by more than two-thirds from 2021.</p>
+      <span class="src">Crunchbase News, 2024 data</span>
+    </section>
+
+    <section class="step" data-scene="geo">
+      <span class="eyebrow">Scene 5 · 2025 · where</span>
+      <div class="num">~400<small>of 1,000</small></div>
+      <h2>landed in one metro: the San Francisco Bay Area.</h2>
+      <p>New York took about 140. Los Angeles and Boston about 80 and 70. Every other place in the country shares the scattered dots around the edge.</p>
+      <p class="flag">⚑ Bay Area share is 39–41% depending on the sample.</p>
+      <span class="src">Carta 2025 (41.3% Bay Area, 14% NY); GeekWire (~39%)</span>
+      <p class="flag">⚑ LA (~8%) and Boston (~7%) come from secondary coverage of Carta data. Confirm before citing.</p>
+    </section>
+
+    <section class="step" data-scene="funnel">
+      <span class="eyebrow">Scene 6 · new unit: startups</span>
+      <div class="num">1<small>of 100</small></div>
+      <h2>startups a VC firm looks at gets the check.</h2>
+      <p>That's the median, from a survey of about 885 VCs. Most deals arrive through networks, and the team is rated the top reason to invest. With that much filtering, whatever a screener treats as a "good founder" decides almost everything.</p>
+      <span class="src">Gompers, Gornall, Kaplan &amp; Strebulaev (2020), Journal of Financial Economics</span>
+    </section>
+
+    <section class="step" data-scene="voice">
+      <span class="eyebrow">Scene 7 · same pitch, different voice</span>
+      <div class="num">68<small>vs 32</small></div>
+      <h2>Out of 100 people choosing between identical pitches, 68 backed the one narrated by a man.</h2>
+      <p>The words were the same. Only the voice changed. Women and men watching made the same choice.</p>
+      <div class="key"><span><i style="background:var(--b)"></i>chose the male-voiced pitch</span><span><i style="background:var(--a)"></i>chose the female-voiced pitch</span></div>
+      <span class="src">Brooks, Huang, Kearney &amp; Murray (2014), PNAS</span>
+    </section>
+
+    <section class="step" data-scene="inbox">
+      <span class="eyebrow">Scene 8 · but not everywhere</span>
+      <div class="num">45<small>vs 41</small></div>
+      <h2>interested replies per 1,000 cold pitch emails: female names got slightly more.</h2>
+      <p>80,000 fake pitches went to 28,000 investors with randomly assigned founder names. At the inbox, women weren't penalized. The bias in this research shows up later: in meetings, networks and who follows up.</p>
+      <div class="key"><span><i style="background:var(--a)"></i>female-named sender</span><span><i style="background:var(--b)"></i>male-named sender</span><span>bright = interested reply</span></div>
+      <span class="src">Gornall &amp; Strebulaev (2025), Management Science (4.5% vs 4.1%)</span>
+    </section>
+
+    <section class="step" data-scene="loop">
+      <span class="eyebrow">Scene 9 · now add an AI</span>
+      <h2>Train a screener on past winners. Its picks become the next winners.</h2>
+      <p>Funded founders go around the loop and become training data. Rejected founders fall off and never produce an outcome, so the model never learns it was wrong about them. Researchers call this the selective-labels problem.</p>
+      <span class="src">Lakkaraju et al. (2017); Ensign et al. (2018); Bonelli (2023)</span>
+    </section>
+
+    <section class="step" data-scene="sim">
+      <span class="eyebrow">Scene 10 · from your simulator</span>
+      <div class="num">25<small>vs 48</small></div>
+      <h2>top-talent women vs. top-talent men funded, per 100, by a prototype-matching AI.</h2>
+      <p>Talent was equal by design. The gap came from a skewed history and a model that funds whoever resembles past winners. It didn't spiral, it locked in.</p>
+      <p class="flag">⚑ Simulation under stated assumptions. It shows a mechanism, not a real-world measurement.</p>
+      <span class="src">The Prototype Machine v0.1, 200 runs</span>
+    </section>
+
+    <section class="step" data-scene="end">
+      <span class="eyebrow">End of the ride, for now</span>
+      <h2>Ten claims this thesis depends on. None is settled yet, and none has interview evidence.</h2>
+      <p>The dots will change as the research does. Next: talk to the VCs who use these tools and the ones who don't.</p>
+      <div class="links">
+        <a href="../machine/">Play the Prototype Machine</a>
+        <a href="../research/">Research map</a>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const N=1000, cv=document.getElementById("cv"), ctx=cv.getContext("2d"), inner=document.getElementById("stageInner");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let W=0,H=0,DPR=1,colors={};
+function readColors(){const s=getComputedStyle(document.documentElement);["dot","a","b","hot","ink","flag","muted"].forEach(k=>colors[k]=s.getPropertyValue("--"+k).trim());}
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);const r=inner.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+
+/* seeded random for stable layouts */
+function rng(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s>>>=0;s^=s>>17;s^=s<<5;s>>>=0;return s/4294967296;};}
+const R=rng(20261031);
+const jit=Array.from({length:N},()=>({a:R()*Math.PI*2,r:R(),ph:R()*Math.PI*2,sp:.6+R()*.8,u:R(),v:R()}));
+
+/* particles: current state */
+const P=Array.from({length:N},(_,i)=>({x:.5+(jit[i].u-.5)*.9,y:.5+(jit[i].v-.5)*.9,c:"dot",a:.9,s:1,hollow:false}));
+
+/* layout helpers return normalized [0..1] coords */
+function gridPos(i,n,cols,x0,y0,w,h){const rows=Math.ceil(n/cols);const cx=i%cols,cy=Math.floor(i/cols);return[x0+w*(cols===1?.5:cx/(cols-1)),y0+h*(rows===1?.5:cy/(rows-1))];}
+function blob(i,cx,cy,rad){const j=jit[i];const rr=rad*Math.sqrt(j.r);return[cx+rr*Math.cos(j.a),cy+rr*Math.sin(j.a)];}
+function ring(i,cx,cy,rad){const j=jit[i];const rr=rad*(1+(j.r-.5)*.5);return[cx+rr*Math.cos(j.a),cy+rr*Math.sin(j.a)];}
+const dim={c:"dot",a:.35,s:.8};
+
+/* each scene: (i,t) => target {x,y,c,a,s,hollow}; labels: [{x,y,t,hot}] */
+const SCENES={
+  intro:{f:(i,t)=>{const j=jit[i];return{x:.5+(j.u-.5)*.86+.01*Math.sin(t*j.sp+j.ph),y:.5+(j.v-.5)*.86+.01*Math.cos(t*j.sp+j.ph),c:"dot",a:.9,s:1};},labels:[]},
+  women:{f:i=>{const[x,y]=gridPos(i,N,40,.06,.08,.88,.84);return{x,y,c:i<277?"a":"dot",a:i<277?1:.75,s:1};},labels:[{x:.5,y:.965,t:"each dot = $1 of every $1,000"}]},
+  megadeals:{f:i=>{
+      if(i<113){const[x,y]=blob(i,.36,.4,.17);return{x,y,c:"a",a:1,s:1.15};}
+      if(i<185){const[x,y]=blob(i,.68,.36,.1);return{x,y,c:"a",a:.8,s:1};}
+      if(i<277){const k=i-185;const[x,y]=blob(i,.18+(k%4)*.2,.78,.05);return{x,y,c:"a",a:.6,s:.9};}
+      const[x,y]=ring(i,.5,.5,.5);return{x,y,...dim,a:.18};},
+    labels:[{x:.36,y:.15,t:"2 AI megadeals",hot:1},{x:.68,y:.2,t:"all other AI"},{x:.5,y:.9,t:"everything else"}]},
+  allfemale:{f:i=>{const[x,y]=gridPos(i,N,40,.06,.08,.88,.84);
+      if(i<11)return{x,y,c:"a",a:1,s:1.7};if(i<21)return{x,y,c:"a",a:1,s:1.7,hollow:true};return{x,y,c:"dot",a:.35,s:.9};},
+    labels:[{x:.5,y:.965,t:"solid = low estimate · hollow = disputed"}]},
+  black:{f:i=>{const[x,y]=gridPos(i,N,40,.06,.08,.88,.84);
+      const hit=i===212||i===517||i===733||i===891;return hit?{x,y,c:"hot",a:1,s:2.4}:{x,y,c:"dot",a:.3,s:.9};},
+    labels:[{x:.5,y:.965,t:"4 bright dots. Look for them."}]},
+  geo:{f:i=>{
+      if(i<400){const[x,y]=blob(i,.3,.45,.16);return{x,y,c:"hot",a:.95,s:1};}
+      if(i<540){const[x,y]=blob(i,.72,.3,.09);return{x,y,c:"b",a:.9,s:1};}
+      if(i<620){const[x,y]=blob(i,.2,.82,.065);return{x,y,c:"b",a:.75,s:1};}
+      if(i<690){const[x,y]=blob(i,.82,.62,.06);return{x,y,c:"b",a:.75,s:1};}
+      const[x,y]=ring(i,.5,.5,.47);return{x,y,c:"dot",a:.7,s:.9};},
+    labels:[{x:.3,y:.25,t:"Bay Area",hot:1},{x:.72,y:.17,t:"New York"},{x:.2,y:.71,t:"LA"},{x:.82,y:.51,t:"Boston"},{x:.5,y:.985,t:"everywhere else"}]},
+  funnel:{f:(i,t)=>{
+      if(i>=100){const[x,y]=ring(i,.5,.5,.6);return{x,y,c:"dot",a:0,s:.5};}
+      if(i===0){const p=reduce?1:(Math.sin(t*.9)*.5+.5);return{x:.5,y:.66+.22*p,c:"hot",a:1,s:2.6};}
+      const[gx,gy]=gridPos(i,100,10,.24,.08,.52,.34);const j=jit[i];
+      const fy=.46+j.r*.16,fx=.5+(gx-.5)*(1-(fy-.42)/.24)*.9;
+      const ph=reduce?0:(Math.sin(t*.7+j.ph)*.5+.5)*.35;return{x:gx+(fx-gx)*ph,y:gy+(fy-gy)*ph,c:"dot",a:.95,s:1.6};},
+    labels:[{x:.5,y:.03,t:"100 startups pitched"},{x:.5,y:.95,t:"1 funded",hot:1}]},
+  voice:{f:(i,t)=>{
+      if(i>=100){const[x,y]=ring(i,.5,.5,.6);return{x,y,c:"dot",a:0,s:.5};}
+      const male=i<68;const k=male?i:i-68;const cols=male?8:4;
+      const[x,y]=gridPos(k,male?68:32,cols,male?.1:.66,.22,male?.42:.2,.56);
+      const bob=reduce?0:.006*Math.sin(t*1.4+jit[i].ph);return{x,y:y+bob,c:male?"b":"a",a:1,s:1.9};},
+    labels:[{x:.31,y:.12,t:"male voice: 68",hot:1},{x:.76,y:.12,t:"female voice: 32",hot:1},{x:.5,y:.93,t:"same pitch, 100 choices"}]},
+  inbox:{f:i=>{const female=i<500;const k=female?i:i-500;
+      const[x,y]=gridPos(k,500,20,female?.05:.53,.12,.42,.76);
+      const lit=female?(k%22===0&&k<500):(k%24===0&&k<492);
+      return{x,y,c:female?"a":"b",a:lit?1:.22,s:lit?2:.9};},
+    labels:[{x:.26,y:.05,t:"500 female-named · 23 replies"},{x:.74,y:.05,t:"500 male-named · 21 replies"},{x:.5,y:.95,t:"bright = interested reply"}]},
+  loop:{f:(i,t)=>{const j=jit[i];const speed=reduce?0:.35;
+      if(i<260){const ang=j.a+t*speed;const rr=.3+(j.r-.5)*.035;return{x:.5+rr*Math.cos(ang),y:.48+rr*Math.sin(ang),c:i<215?"b":"a",a:.95,s:1.1};}
+      if(i<560){const fall=reduce?.6:((t*.12+j.u)%1);const ang=j.a;const rr=.3+fall*.25;
+        return{x:.5+rr*Math.cos(ang),y:.48+rr*Math.sin(ang)+fall*.12,c:j.v<.5?"a":"b",a:Math.max(0,.55*(1-fall)),s:.9};}
+      const[x,y]=blob(i,.5,.48,.12);return{x,y,c:"dot",a:.25,s:.7};},
+    labels:[{x:.5,y:.48,t:"past winners → model → new winners",hot:1},{x:.5,y:.93,t:"falling dots: rejected, never labeled"}]},
+  sim:{f:i=>{
+      if(i>=200){const[x,y]=ring(i,.5,.5,.6);return{x,y,c:"dot",a:0,s:.5};}
+      const women=i<100;const k=women?i:i-100;const[x,y]=gridPos(k,100,10,women?.08:.56,.2,.36,.6);
+      const lit=women?k<25:k<48;return{x,y,c:women?"a":"b",a:lit?1:.2,s:lit?1.9:1.3};},
+    labels:[{x:.26,y:.1,t:"top-talent women: 25 funded",hot:1},{x:.74,y:.1,t:"top-talent men: 48 funded",hot:1},{x:.5,y:.92,t:"same talent, by design"}]},
+  end:{f:(i,t)=>{const j=jit[i];const q=reduce?0:t;
+      return{x:.5+(j.u-.5)*.86+.012*Math.sin(q*j.sp+j.ph),y:.5+(j.v-.5)*.86+.012*Math.cos(q*j.sp+j.ph),c:i%10===0?"hot":"dot",a:i%10===0?.9:.5,s:1};},
+    labels:[{x:.5,y:.5,t:"the picture changes as the evidence does"}]}
+};
+
+let scene="intro",labelEls=[];
+function setLabels(){labelEls.forEach(l=>l.remove());labelEls=(SCENES[scene].labels||[]).map(l=>{const d=document.createElement("div");d.className="label"+(l.hot?" hot":"");d.textContent=l.t;d.style.left=(l.x*100)+"%";d.style.top=(l.y*100)+"%";inner.appendChild(d);return d;});}
+function setScene(s){if(s===scene||!SCENES[s])return;scene=s;setLabels();
+  document.querySelectorAll("#prog i").forEach((d,k)=>d.classList.toggle("on",steps[k].dataset.scene===s));
+  if(reduce)snap();}
+function snap(){const t=performance.now()/1000;for(let i=0;i<N;i++){Object.assign(P[i],SCENES[scene].f(i,t));}}
+
+function frame(now){
+  const t=now/1000,f=SCENES[scene].f,unit=Math.min(W,H),ox=(W-unit)/2,oy=(H-unit)/2;
+  ctx.clearRect(0,0,W,H);const k=reduce?1:.075;
+  for(let i=0;i<N;i++){const p=P[i],g=f(i,t);
+    p.x+=(g.x-p.x)*k;p.y+=(g.y-p.y)*k;p.a+=((g.a??1)-p.a)*k;p.s+=((g.s??1)-p.s)*k;p.c=g.c;p.hollow=!!g.hollow;
+    if(p.a<.01)continue;const r=Math.max(.6,unit/250)*p.s;
+    ctx.globalAlpha=p.a;const col=colors[p.c]||colors.dot;
+    ctx.beginPath();ctx.arc(ox+p.x*unit,oy+p.y*unit,r,0,Math.PI*2);
+    if(p.hollow){ctx.strokeStyle=col;ctx.lineWidth=1.4;ctx.stroke();}else{ctx.fillStyle=col;ctx.fill();}}
+  ctx.globalAlpha=1;
+  if(!reduce||scene==="loop"||scene==="funnel")requestAnimationFrame(frame);else setTimeout(()=>requestAnimationFrame(frame),250);
+}
+
+const steps=[...document.querySelectorAll(".step")];
+document.getElementById("prog").innerHTML=steps.map(()=>"<i></i>").join("");
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)setScene(e.target.dataset.scene);});},{rootMargin:"-45% 0px -45% 0px"});
+steps.forEach(s=>io.observe(s));
+
+readColors();resize();setLabels();document.querySelector("#prog i").classList.add("on");
+addEventListener("resize",resize);
+new ResizeObserver(resize).observe(inner);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",readColors);
+new MutationObserver(readColors).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

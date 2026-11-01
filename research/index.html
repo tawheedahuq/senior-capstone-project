@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}*{box-sizing:border-box}body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}.home-link{font-family:ui-monospace,Menlo,monospace;font-size:12px}</style>
+<title>VC Bias Research Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a literature map — four pillars converge on one central question, then counter-evidence, the gap, and what to verify. */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --ink:#18202b; --muted:#5a6573; --line:#d8dde4;
+  --accent:#1f5f74; --accent-soft:#e2eef2; --flag:#9a5b00; --flag-soft:#fbf0dc; --counter:#5b3f8c; --counter-soft:#eee8f7;
+  --p1:#1f5f74; --p2:#7a4b16; --p3:#3d6b2f; --p4:#5b3f8c;
+  --display:"Newsreader", Georgia, "Times New Roman", serif;
+  --body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161d; --surface:#18202a; --ink:#e6eaef; --muted:#9aa5b2; --line:#2b3542;
+  --accent:#6fb7cc; --accent-soft:#1a2e36; --flag:#e3a64a; --flag-soft:#2e2414; --counter:#b39be0; --counter-soft:#251f33;
+  --p1:#6fb7cc; --p2:#d9a066; --p3:#8fc27e; --p4:#b39be0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161d; --surface:#18202a; --ink:#e6eaef; --muted:#9aa5b2; --line:#2b3542;
+  --accent:#6fb7cc; --accent-soft:#1a2e36; --flag:#e3a64a; --flag-soft:#2e2414; --counter:#b39be0; --counter-soft:#251f33;
+  --p1:#6fb7cc; --p2:#d9a066; --p3:#8fc27e; --p4:#b39be0; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:48px}
+h1,h2,h3{font-family:var(--display);font-weight:600;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,5vw,44px)} h2{font-size:26px} h3{font-size:18px;font-family:var(--body);font-weight:600}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+a{color:var(--accent)} a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header{display:flex;flex-direction:column;gap:12px;max-width:72ch}
+header .lede{font-size:17px;color:var(--muted)}
+.note{background:var(--flag-soft);border-left:3px solid var(--flag);padding:12px 14px;font-size:14px}
+
+/* convergence map */
+.map{display:grid;grid-template-columns:1fr 1.15fr 1fr;grid-template-areas:"a core b" "c core d";gap:14px;align-items:stretch}
+.pill{background:var(--surface);border:1px solid var(--line);padding:14px 16px;display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--ink)}
+.pill:hover{border-color:var(--pc)}
+.pill .tag{font-family:var(--mono);font-size:11px;color:var(--pc);letter-spacing:.06em;text-transform:uppercase}
+.pill strong{font-size:16px}
+.pill span.q{font-size:13.5px;color:var(--muted)}
+.core{grid-area:core;background:var(--ink);color:var(--bg);padding:22px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.core .eyebrow{color:var(--bg);opacity:.7}
+.core p.big{font-family:var(--display);font-size:22px;line-height:1.25}
+.core p.small{font-size:13.5px;opacity:.8}
+@media (max-width:760px){.map{grid-template-columns:1fr 1fr;grid-template-areas:"core core" "a b" "c d"}}
+@media (max-width:440px){.map{grid-template-columns:1fr;grid-template-areas:"core" "a" "b" "c" "d"}}
+
+/* numbers */
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.num{background:var(--surface);padding:16px;display:flex;flex-direction:column;gap:4px}
+.num b{font-family:var(--display);font-size:32px;font-weight:600;font-variant-numeric:tabular-nums}
+.num .src{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.num.warn b::after{content:" ⚑";color:var(--flag);font-size:18px}
+
+/* pillars */
+.pillar{display:flex;flex-direction:column;gap:16px;scroll-margin-top:16px}
+.pillar-head{display:flex;flex-direction:column;gap:6px;border-top:3px solid var(--pc);padding-top:14px}
+.pillar-head p{color:var(--muted);max-width:72ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cite{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.use{font-size:13.5px;border-top:1px dashed var(--line);padding-top:8px}
+.use b{color:var(--pc)}
+.chip{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;margin-right:4px}
+.chip.ok{background:var(--accent-soft);color:var(--accent)}
+.chip.flag{background:var(--flag-soft);color:var(--flag)}
+.chip.counter{background:var(--counter-soft);color:var(--counter)}
+
+/* gap */
+.gap{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;align-items:start}
+.gap .box{background:var(--surface);border:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:10px}
+.loop{width:100%;height:auto;max-width:420px}
+@media (max-width:760px){.gap{grid-template-columns:1fr}}
+ol.steps,ul.plain{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.sources{font-size:13px;color:var(--muted);columns:2 320px;column-gap:28px}
+.sources li{break-inside:avoid;margin-bottom:6px}
+footer{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<p class="home-link" style="max-width:1200px;margin:12px auto 0;padding-inline:max(16px,env(safe-area-inset-left,0px))"><a href="../" style="color:inherit">← Capstone home</a></p>
+<div class="wrap">
+<header>
+  <span class="eyebrow">COGS 301 · Senior project · foundation research · Oct 31, 2026</span>
+  <h1>Who the model learns to fund</h1>
+  <p class="lede">The literature your thesis stands on, sorted into four pillars, plus the evidence that cuts against the bias story and the gap your simulator would fill.</p>
+  <p class="note">Every paper here came up in a search today and was checked against at least one primary or publisher listing. Numbers marked ⚑ conflict across sources or come from secondary coverage. Confirm them in the original report before they go in the proposal, and run the reading list past Dr. Pearl.</p>
+</header>
+
+<section aria-labelledby="map-h" style="display:flex;flex-direction:column;gap:14px">
+  <h2 id="map-h">The map</h2>
+  <div class="map">
+    <a class="pill" href="#p1" style="grid-area:a;--pc:var(--p1)"><span class="tag">Pillar 1</span><strong>Funding gaps</strong><span class="q">Who gets funded today, by gender, race and geography.</span></a>
+    <a class="pill" href="#p2" style="grid-area:b;--pc:var(--p2)"><span class="tag">Pillar 2</span><strong>AI screening in VC</strong><span class="q">What happens when investors hand screening to models.</span></a>
+    <div class="core">
+      <span class="eyebrow">Central question</span>
+      <p class="big">If an AI screener learns from past exits, and its picks become the next round of exits, does bias compound cycle after cycle?</p>
+      <p class="small">Scoped to gender, school prestige and geography. Hypothesis to test, not assume: traction may outweigh founder background at screening.</p>
+    </div>
+    <a class="pill" href="#p3" style="grid-area:c;--pc:var(--p3)"><span class="tag">Pillar 3</span><strong>Feedback-loop bias</strong><span class="q">How decisions shape the data the next model trains on.</span></a>
+    <a class="pill" href="#p4" style="grid-area:d;--pc:var(--p4)"><span class="tag">Pillar 4</span><strong>Cog-sci foundations</strong><span class="q">Prototypes, representativeness, gut feel.</span></a>
+  </div>
+</section>
+
+<section aria-labelledby="nums-h" style="display:flex;flex-direction:column;gap:14px">
+  <h2 id="nums-h">The numbers behind the gap</h2>
+  <div class="nums">
+    <div class="num"><b>27.7%</b><span>of US VC deal value went to companies with at least one female founder in 2025, a record</span><span class="src">PitchBook All In 2025, via Business Wire</span></div>
+    <div class="num"><b>~2/3</b><span>of that female-founder capital went into AI, much of it two megadeals (Anthropic, Scale AI)</span><span class="src">PitchBook, via Fortune / Invezz</span></div>
+    <div class="num warn"><b>~1–2%</b><span>to all-female teams. Sources disagree: 1.1% (2025), 2.0% (2024), 2.1% (Q1 2026)</span><span class="src">Secondary readings of PitchBook data</span></div>
+    <div class="num"><b>0.4%</b><span>of US startup funding went to companies with a Black founder in 2024 (~$730M)</span><span class="src">Crunchbase News</span></div>
+    <div class="num warn"><b>~39–41%</b><span>of US startup capital went to the Bay Area in 2025, depending on the sample</span><span class="src">Carta (41.3%); GeekWire (~39%)</span></div>
+    <div class="num"><b>1 in 100</b><span>roughly how many deals a median VC firm considers per deal it closes</span><span class="src">Gompers et al. survey, NBER digest</span></div>
+  </div>
+</section>
+
+<section class="pillar" id="p1" style="--pc:var(--p1)">
+  <div class="pillar-head"><span class="eyebrow" style="color:var(--pc)">Pillar 1</span><h2>Funding gaps: who gets funded and why</h2>
+  <p>The baseline your simulator starts from. These papers separate "fewer women and minorities get funded" from "investors are biased", which are different claims.</p></div>
+  <div class="cards">
+    <article class="card"><h3>Same pitch, different voice</h3><p>Across real pitch competitions and two experiments, investors preferred identical pitches narrated by men. Attractiveness boosted men and made no difference for women.</p><span class="cite">Brooks, Huang, Kearney &amp; Murray (2014), PNAS 111(12)</span><p class="use"><b>For you:</b> clean evidence of bias in the human signal any model would learn from.</p></article>
+    <article class="card"><h3>Promotion vs. prevention questions</h3><p>Investors tended to ask men about potential gains and women about avoiding losses, a pattern the authors tie to the funding gap. The paper won AMJ's best paper award for 2019.</p><span class="cite">Kanze, Huang, Conley &amp; Higgins (2018), Academy of Management Journal 61(2), 586–614</span><p class="use"><b>For you:</b> a mechanism you can listen for in VC interviews, and a feature an LLM screener could inherit from pitch transcripts.</p></article>
+    <article class="card"><h3>Male investors, female founders</h3><p>On AngelList, women were less successful with male investors than similar men. Where women did get male backing, those startups did as well or better, which points to taste-based bias.</p><span class="cite">Ewens &amp; Townsend (2020), Journal of Financial Economics 135(3), 653–677</span><p class="use"><b>For you:</b> the "chicken and egg" point. Most investors and past founders are men, so historical data starts tilted.</p></article>
+    <article class="card"><h3>Networks, not just judgments</h3><p>At HBS's venture competition, exposure to more VC judges helped men start VC-backed firms but not women. Men followed up with judges far more often; judges responded equally.</p><span class="cite">Howell &amp; Nanda (2024), JFQA 59(6), 2733–2761</span><p class="use"><b>For you:</b> bias can enter at sourcing, before any screener sees the deal. Worth a variable in the model.</p></article>
+    <article class="card"><h3>Birds of a feather</h3><p>VCs who share ethnicity, school or past employer co-invest more, and those affinity-based syndicates perform worse, especially early stage.</p><span class="cite">Gompers, Mukharlyamov &amp; Xuan (2016), Journal of Financial Economics 119(3)</span><p class="use"><b>For you:</b> homophily has a measurable cost. Supports the school-prestige dimension.</p></article>
+    <article class="card"><h3>Venture bearding</h3><p>Law scholars name the practice of founders masking stigmatized identity to raise, from changing how they present to adding a male co-founder to front the raise.</p><span class="cite">Edwards &amp; McGinley (2019), UC Davis Law Review 52, 1873</span><p class="use"><b>For you:</b> the term Dr. Pearl raised. Also a data problem: bearded teams look male-led in datasets.</p></article>
+  </div>
+</section>
+
+<section class="pillar" id="p2" style="--pc:var(--p2)">
+  <div class="pillar-head"><span class="eyebrow" style="color:var(--pc)">Pillar 2</span><h2>AI and algorithmic screening in VC</h2>
+  <p>The closest literature to your question. It already shows AI can both widen and narrow who gets funded, which is why a multi-cycle view matters.</p></div>
+  <div class="cards">
+    <article class="card"><h3>AI makes VCs pick the familiar</h3><p>After VC firms adopt AI screening, they shift toward startups resembling ones already tried. They get fewer failures but also fewer rare breakout wins.</p><span class="cite">Bonelli (2023), "Data-driven Investors", HEC Paris working paper</span><p class="use"><b>For you:</b> the single most relevant paper. Backward-looking similarity is exactly the prototype effect you want to model.</p></article>
+    <article class="card"><h3>VCs think in stereotypes; algorithms might not</h3><p>On French data covering VC-backed and non-backed firms, an ML model found VCs pass on predictably good founders. Algorithm-picked firms had more women, younger founders and more non-Paris founders.</p><span class="cite">Lyonnet &amp; Stern, "Machine Learning About Venture Capital Choices" (2025 draft; earlier "Venture Capital (Mis)Allocation in the Age of AI"), R&amp;R at Review of Financial Studies</span><p class="use"><span class="chip counter">Counterpoint</span> A model trained on <i>all</i> new firms can reduce bias. The training set is the lever.</p></article>
+    <article class="card"><h3>What VCs say they weigh</h3><p>Surveying roughly 885 institutional VCs, the team was rated most important for selection, ahead of product or market. Most deals came through networks; about 10% were inbound.</p><span class="cite">Gompers, Gornall, Kaplan &amp; Strebulaev (2020), Journal of Financial Economics 135(1), 169–190</span><p class="use"><b>For you:</b> if "team" dominates, founder background has a direct path into any model trained on VC choices. Tests your traction hypothesis.</p></article>
+    <article class="card"><h3>Human vs. model screening</h3><p>An Earlybird partner benchmarked a screening model against over a hundred human investors. His firm now uses AI for top-of-funnel screening with humans deciding.</p><span class="cite">Retterath (2020), SSRN working paper</span><p class="use"><span class="chip flag">Verify</span> Coverage gives 111 vs. 114 investors and accuracy of 80% vs. 57% only via a German press summary. Read the paper before citing numbers. He'd also be a strong interview.</p></article>
+    <article class="card"><h3>LLMs and women founders</h3><p>A 2025 study found LLMs leaned toward masculine traits over feminine ones specifically in investment scenarios.</p><span class="cite">"Detecting Gender Stereotype Biases Against Women Entrepreneurs in LLMs", Journal of Business Ethics 207 (2026)</span><p class="use"><b>For you:</b> the off-the-shelf LLM layer (the "pattern-matching" firm you worked with) may carry its own bias. Authors not captured in my search; pull the paper.</p></article>
+    <article class="card"><h3>Names change LLM advice</h3><p>An audit across 42 prompt templates found GPT-4 and other models gave worse advice to names associated with women and racial minorities. Numeric anchors in the prompt reduced the gap.</p><span class="cite">Salinas, Haim &amp; Nyarko (2025), Stanford Law, arXiv 2402.14875</span><p class="use"><b>For you:</b> a ready intervention to test: does giving the screener traction numbers shrink demographic effects?</p></article>
+  </div>
+</section>
+
+<section class="pillar" id="p3" style="--pc:var(--p3)">
+  <div class="pillar-head"><span class="eyebrow" style="color:var(--pc)">Pillar 3</span><h2>Feedback-loop bias and finance analogs</h2>
+  <p>The methodological backbone of your simulator. None of these are about VC, which is part of the point.</p></div>
+  <div class="cards">
+    <article class="card"><h3>Runaway feedback loops</h3><p>A model that sends police where past arrests were recorded only observes crime where it sends police, so it keeps sending them back regardless of true crime rates. The authors prove this with simple urn models and test fixes.</p><span class="cite">Ensign, Friedler, Neville, Scheidegger &amp; Venkatasubramanian (2018), FAT* / PMLR 81</span><p class="use"><b>For you:</b> your blueprint. Swap "neighborhoods" for founder groups and "arrests" for exits. Their simulation code is public on GitHub (algofairness/runaway-feedback-loops-src).</p></article>
+    <article class="card"><h3>Selective labels</h3><p>When human decisions decide which cases get outcomes (bail, treatment), the data only shows results for those chosen. Comparing a model to humans on that data misleads.</p><span class="cite">Lakkaraju, Kleinberg, Leskovec, Ludwig &amp; Mullainathan (2017), KDD</span><p class="use"><b>For you:</b> unfunded startups never get an exit label. This names the core data problem in VC and justifies a simulation.</p></article>
+    <article class="card"><h3>ML in credit: better accuracy, unequal gains</h3><p>On ~10M US mortgages, ML predicted default better than logistic models, but Black and Hispanic borrowers were less likely to benefit, and rate disparity widened in their market model.</p><span class="cite">Fuster, Goldsmith-Pinkham, Ramadorai &amp; Walther (2022), Journal of Finance 77(1), 5–47</span><p class="use"><b>For you:</b> the credit case for your "AI across financial infrastructure" framing. Accuracy and fairness can diverge.</p></article>
+    <article class="card"><h3>Fintech lending discrimination</h3><p>Latinx and African-American borrowers paid higher rates on equivalent mortgages, about $765M a year. Algorithmic lenders cut the gap by over a third and showed no discrimination in rejections.</p><span class="cite">Bartlett, Morse, Stanton &amp; Wallace (2022 version; NBER w25943)</span><p class="use"><span class="chip counter">Counterpoint</span> Algorithms can reduce human bias. Your simulator should allow that outcome too.</p></article>
+  </div>
+</section>
+
+<section class="pillar" id="p4" style="--pc:var(--p4)">
+  <div class="pillar-head"><span class="eyebrow" style="color:var(--pc)">Pillar 4</span><h2>Cognitive-science foundations</h2>
+  <p>What makes this a Cog Sci thesis rather than a finance one. Grading criteria reward understanding of background literature and original ideas; this is where yours lives.</p></div>
+  <div class="cards">
+    <article class="card"><h3>Prototype theory</h3><p>Categories are organized around their best examples, and members are judged by resemblance to that prototype rather than by strict definitions.</p><span class="cite">Rosch (1975), J. Exp. Psych: General 104(3), 192–233; Rosch &amp; Mervis (1975), Cognitive Psychology 7</span><p class="use"><b>For you:</b> "fundable founder" as a category whose prototype was set by past winners. A model trained on exits learns that prototype.</p></article>
+    <article class="card"><h3>Representativeness</h3><p>People judge probability by similarity to a stereotype and neglect base rates.</p><span class="cite">Tversky &amp; Kahneman (1974), Science 185(4157), 1124–1131</span><p class="use"><b>For you:</b> the classic link between prototypes and investment error.</p></article>
+    <article class="card"><h3>Stereotypes with a kernel of truth</h3><p>A formal model where people overweight traits that are more common in one group than another. The result is often roughly accurate but exaggerated.</p><span class="cite">Bordalo, Coffman, Gennaioli &amp; Shleifer (2016), QJE 131(4), 1753–1794</span><p class="use"><b>For you:</b> Lyonnet &amp; Stern apply this exact model to VCs. It bridges Pillar 4 to Pillar 2.</p></article>
+    <article class="card"><h3>Gut feel is not random</h3><p>Angel investors' gut feel blended intuition and analysis. It produced fewer hits overall but bigger ones.</p><span class="cite">Huang &amp; Pearce (2015), Administrative Science Quarterly 60(4), 634–670</span><p class="use"><b>For you:</b> what the conversational firm you worked with does. What does a model lose when it replaces this?</p></article>
+  </div>
+</section>
+
+<section aria-labelledby="counter-h" class="pillar" style="--pc:var(--counter)">
+  <div class="pillar-head"><span class="eyebrow" style="color:var(--pc)">Read this before the proposal</span><h2 id="counter-h">Evidence against the simple bias story</h2>
+  <p>Your stated hypothesis is to test bias, not presuppose it. These findings keep the thesis honest, and a reviewer will expect you to address them.</p></div>
+  <div class="cards">
+    <article class="card"><h3>Cold emails favored women</h3><p>80,000 fictitious pitch emails to 28,000 investors: female-named founders got about 9% more interested replies than men with identical pitches, and Asian-named founders about 6% more than White-named.</p><span class="cite">Gornall &amp; Strebulaev (2025), Management Science</span><p class="use">The authors only rule out bias at first contact. They suggest looking at networks and in-person meetings, which fits Howell &amp; Nanda.</p></article>
+    <article class="card"><h3>Algorithms widened the pool</h3><p>Lyonnet &amp; Stern's model picked more women and non-capital-city founders than VCs did. Bartlett et al. found fintech lenders reduced rate gaps.</p><span class="cite">See Pillars 2 and 3</span><p class="use">So the claim to test is narrower: <i>which</i> training data and feedback structure makes AI compound bias versus correct it.</p></article>
+  </div>
+</section>
+
+<section aria-labelledby="gap-h" style="display:flex;flex-direction:column;gap:14px">
+  <h2 id="gap-h">The gap your project fills</h2>
+  <div class="gap">
+    <div class="box">
+      <p>The VC papers above are mostly snapshots: one dataset, one decision point. The feedback-loop papers model dynamics, but in policing and credit. In today's search I did not find a study that simulates an AI screener retraining on its own funded cohorts over multiple cycles. That is not proof none exists. Run a proper database search (Google Scholar, SSRN) and ask Dr. Pearl before claiming novelty.</p>
+      <ol class="steps">
+        <li>Start from the selective-labels problem: only funded startups get exit labels.</li>
+        <li>Borrow Ensign et al.'s urn setup and swap in founder groups and exits.</li>
+        <li>Seed with real gaps (Pillar 1) and a prototype-weighted scorer (Pillar 4).</li>
+        <li>Run ~5 cycles, then test interventions: numeric traction anchors, exploration quotas, training on unfunded firms too.</li>
+        <li>Use VC and founder interviews to check which signals screeners actually use.</li>
+      </ol>
+    </div>
+    <div class="box" aria-label="Diagram of the feedback loop">
+      <svg class="loop" viewBox="0 0 400 300" role="img" aria-labelledby="loopt">
+        <title id="loopt">Feedback loop: historical exits train the AI screener, which picks who gets funded, whose outcomes become the next training data. Unfunded founders never produce labels.</title>
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--p3)"/></marker></defs>
+        <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="13" fill="var(--ink)">
+          <rect x="130" y="16" width="140" height="44" fill="var(--surface)" stroke="var(--p3)" stroke-width="1.5"/><text x="200" y="43" text-anchor="middle">Historical exits</text>
+          <rect x="262" y="128" width="128" height="44" fill="var(--surface)" stroke="var(--p3)" stroke-width="1.5"/><text x="326" y="155" text-anchor="middle">AI screener</text>
+          <rect x="130" y="236" width="140" height="44" fill="var(--surface)" stroke="var(--p3)" stroke-width="1.5"/><text x="200" y="263" text-anchor="middle">Funded cohort</text>
+          <rect x="10" y="128" width="128" height="44" fill="var(--surface)" stroke="var(--p3)" stroke-width="1.5"/><text x="74" y="149" text-anchor="middle">Outcomes</text><text x="74" y="164" text-anchor="middle" font-size="11" fill="var(--muted)">(funded only)</text>
+          <path d="M272,52 Q320,80 326,124" fill="none" stroke="var(--p3)" stroke-width="1.6" marker-end="url(#arr)"/>
+          <path d="M326,176 Q320,222 274,248" fill="none" stroke="var(--p3)" stroke-width="1.6" marker-end="url(#arr)"/>
+          <path d="M128,248 Q80,222 74,176" fill="none" stroke="var(--p3)" stroke-width="1.6" marker-end="url(#arr)"/>
+          <path d="M74,124 Q80,80 126,52" fill="none" stroke="var(--p3)" stroke-width="1.6" marker-end="url(#arr)"/>
+          <text x="352" y="96" font-size="11" fill="var(--muted)">trains</text>
+          <text x="330" y="222" font-size="11" fill="var(--muted)">picks</text>
+          <text x="200" y="152" text-anchor="middle" font-size="12" fill="var(--flag)">Unfunded founders:</text>
+          <text x="200" y="168" text-anchor="middle" font-size="12" fill="var(--flag)">no label, ever</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="todo-h" style="display:flex;flex-direction:column;gap:12px">
+  <h2 id="todo-h">Verify before citing</h2>
+  <ul class="plain">
+    <li>All-female-team funding share for 2025: pull the figure directly from PitchBook's 2025 All In report (sources here range 1.1–2.1%).</li>
+    <li>Retterath's benchmark numbers: read the SSRN paper; the 80% / 57% figures come from press coverage.</li>
+    <li>Authors and full citation for the Journal of Business Ethics LLM study.</li>
+    <li>2025 Black-founder share (0.32%) came from a secondary site citing Crunchbase; check Crunchbase News directly.</li>
+    <li>Novelty of the multi-cycle simulation: Scholar/SSRN search plus Dr. Pearl.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="src-h" style="display:flex;flex-direction:column;gap:12px">
+  <h2 id="src-h">Sources consulted</h2>
+  <ul class="sources">
+    <li><a href="https://www.businesswire.com/news/home/20260305719459/en/AI-Megadeals-and-Capital-Concentration-Define-2025-for-Female-Founders-Across-US-and-Europe" target="_blank" rel="noopener">PitchBook 2025 All In release (Business Wire)</a></li>
+    <li><a href="https://dc.fortune.com/2026/03/06/venture-dollars-female-founders-pitchbook-ai/" target="_blank" rel="noopener">Fortune on AI's share of female-founder funding</a></li>
+    <li><a href="https://milkeninstitute.org/sites/default/files/2025-04/ExecSummaryMissingBillionsWomenLedFundManagers.pdf" target="_blank" rel="noopener">Milken Institute, Missing Billions (2025)</a></li>
+    <li><a href="https://news.crunchbase.com/diversity/startup-funding-share-black-founders-down-cleantech-healthcare/" target="_blank" rel="noopener">Crunchbase News, Black founder funding 2024</a></li>
+    <li><a href="https://www.geekwire.com/2026/heres-where-seattle-ranks-among-u-s-cities-based-on-capital-raised/" target="_blank" rel="noopener">GeekWire on 2025 capital by city</a></li>
+    <li><a href="https://carta.com/data/top-startup-ecosystems-2025/" target="_blank" rel="noopener">Carta, Top startup ecosystems 2025</a></li>
+    <li><a href="https://dspace.mit.edu/handle/1721.1/91283" target="_blank" rel="noopener">Brooks et al. 2014 (MIT DSpace)</a></li>
+    <li><a href="https://play.hhs.se/media/We+Ask+Men+to+Win+and+Women+Not+to+LoseA++Closing+the+Gender+Gap+in+Startup+Funding/0_3d6g9mtg" target="_blank" rel="noopener">Kanze et al. 2018 citation</a></li>
+    <li><a href="https://corpgov.law.harvard.edu/2019/09/20/are-early-stage-investors-biased-against-women" target="_blank" rel="noopener">Ewens &amp; Townsend summary (Harvard Law Forum)</a></li>
+    <li><a href="https://papers.ssrn.com/abstract=3484700" target="_blank" rel="noopener">Howell &amp; Nanda (SSRN)</a></li>
+    <li><a href="https://www.nber.org/papers/w18141" target="_blank" rel="noopener">Gompers, Mukharlyamov &amp; Xuan (NBER)</a></li>
+    <li><a href="https://scholars.law.unlv.edu/facpub/1216/" target="_blank" rel="noopener">Edwards &amp; McGinley, Venture Bearding</a></li>
+    <li><a href="https://ideas.repec.org/p/ebg/heccah/1470.html" target="_blank" rel="noopener">Bonelli, Data-driven Investors (RePEc)</a></li>
+    <li><a href="https://www.hec.edu/en/dare/tech-ai/how-ai-skews-vc-funding-away-breakthroughs" target="_blank" rel="noopener">HEC interview with Bonelli</a></li>
+    <li><a href="https://www.iese.edu/wp-content/uploads/2025/01/6.-paper-Stern-et-al.pdf" target="_blank" rel="noopener">Lyonnet &amp; Stern 2025 draft</a></li>
+    <li><a href="https://www.nber.org/digest/dec16/how-do-venture-capitalists-make-decisions" target="_blank" rel="noopener">Gompers et al., NBER digest</a></li>
+    <li><a href="https://www.trendingtopics.eu/ai-soll-dafuer-sorgen-dass-investoren-das-naechste-unicorn-nicht-verpassen/" target="_blank" rel="noopener">Trending Topics on Retterath's benchmark</a></li>
+    <li><a href="https://link.springer.com/article/10.1007/s10551-025-06216-1" target="_blank" rel="noopener">LLM gender stereotypes vs. women entrepreneurs (J. Business Ethics)</a></li>
+    <li><a href="https://arxiv.org/pdf/2402.14875" target="_blank" rel="noopener">Salinas, Haim &amp; Nyarko (arXiv)</a></li>
+    <li><a href="https://proceedings.mlr.press/v81/ensign18a.html" target="_blank" rel="noopener">Ensign et al. 2018 (PMLR)</a></li>
+    <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5958915" target="_blank" rel="noopener">Lakkaraju et al. 2017 (PMC)</a></li>
+    <li><a href="https://academicnewsletter.sufe.edu.cn/info/359074" target="_blank" rel="noopener">Fuster et al. 2022 abstract</a></li>
+    <li><a href="https://www.nber.org/papers/w25943" target="_blank" rel="noopener">Bartlett et al. (NBER w25943)</a></li>
+    <li><a href="https://academicnewsletter.sufe.edu.cn/info/387103" target="_blank" rel="noopener">Gornall &amp; Strebulaev, Management Science abstract</a></li>
+    <li><a href="https://loterre.istex.fr/P66/en/page/-QR124H6D-W" target="_blank" rel="noopener">Rosch 1975 citation</a></li>
+    <li><a href="https://pubmed.ncbi.nlm.nih.gov/17835457/" target="_blank" rel="noopener">Tversky &amp; Kahneman 1974 (PubMed)</a></li>
+    <li><a href="https://shleifer.scholars.harvard.edu/publications/stereotypes-0" target="_blank" rel="noopener">Bordalo et al. 2016</a></li>
+    <li><a href="https://academicnewsletter.sufe.edu.cn/info/365769" target="_blank" rel="noopener">Huang &amp; Pearce 2015 abstract</a></li>
+  </ul>
+</section>
+
+<footer>Compiled Oct 31, 2026 for Tawheeda Huq's COGS 301 senior project (advisor: Dr. Kallie Pearl). Funding figures change yearly; recheck before the Dec 14 final proposal.</footer>
+</div>
+</body>
+</html>
